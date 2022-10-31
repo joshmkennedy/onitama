@@ -11,6 +11,7 @@ export function PlayerCards({player, selected, setSelected }: { player:1|2, sele
   return <div className="player-cards">
   {cards.map((card) => 
     <CardDisplay
+      key={card[1]}
       classes={
         selected == card[1] ? `selected-card`:''
       } 

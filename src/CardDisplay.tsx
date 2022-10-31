@@ -1,9 +1,11 @@
 import * as React from "react"
 import { buildGrid } from "./Board"
 import { Card, Position } from "./types"
+import { isCenter, isPossibleMove } from "./utils"
 
 const cardGrid = buildGrid(5)
-export default function CardDisplay({classes, owner,handleClick, card }: { classes:string,owner?:1|2,handleClick?:()=>void, card: Card }) {
+export default function CardDisplay({classes, owner,handleClick, card }: { classes:string,owner?:1|2,handleClick?:()=>void, card?: Card }) {
+  if(!card) return null
   return <div className={`card ${classes}`} onClick={handleClick} >
     <h3>{card.name}</h3>
     <div className="card-grid">
@@ -11,6 +13,7 @@ export default function CardDisplay({classes, owner,handleClick, card }: { class
         return row.map((_, x) => {
           return <div
             onClick={handleClick}
+            key={`${x},${y}`}
             className={`
               move-position 
               ${isCenter(5, { x, y }) ? 'me' : ''}
@@ -23,15 +26,3 @@ export default function CardDisplay({classes, owner,handleClick, card }: { class
   </div>
 }
 
-function isCenter(count: number, pos: Position) {
-  if (count % 2 == 0) return false
-  const center = ((count - 1) / 2)
-  return pos.x == center && pos.y == center
-}
-function isPossibleMove(cardPosistions: Position[], { x, y }: Position,owner?:1|2) {
-  return cardPosistions.some(({ x: _xPos, y: _yPos }) => {
-    const xPos = owner && owner == 1 ? _xPos * -1 :_xPos
-    const yPos = owner && owner == 1 ? _yPos * -1 :_yPos
-    return x == 2 + xPos && y == 2 + yPos
-  })
-}

@@ -1,7 +1,8 @@
 import { createContext, useContext, useState } from "react"
 import { Card, GameState, Position, Unit } from "./types"
+import { inverseMovePositions } from "./utils"
 export default function useGameState() {
-  return useContext<{ gameState: GameState }>(GameStateContext)
+  return useContext<{ gameState: GameState, playTurn:(cardIndex: number, unitId?: number, position?: Position|null)=>boolean|void }>(GameStateContext)
 }
 
 const GameStateContext = createContext<any>(null)
@@ -39,6 +40,7 @@ export function StateWrapper({ children }: { children: any }) {
   })
 
   function playTurn(cardIndex: number, unitId: number, position: Position) {
+    console.log(gameState.currentPlayer, unitId,position )
     const currentPlayer = gameState.currentPlayer == 1 ? 'player1' : 'player2';
     const unitIndex = gameState[`${currentPlayer}Units`].findIndex((unit) => unit.id == unitId)
     const unit = gameState[`${currentPlayer}Units`][unitIndex]
@@ -53,7 +55,13 @@ export function StateWrapper({ children }: { children: any }) {
     const card = cards[cardIndex]
 
     //check if position exits on card
-    if (!card.positions.some(({ x, y }) => x == position.x && y == position.y)) {
+    if (!normalizePositions(currentPlayer, card.positions).some(({ x, y }) => {
+      const uPos = unit.position
+      const newX = uPos.x + x
+      const newY = uPos.y + y
+      console.log(newX,newY, position.x, position.y)
+      return  newX == position.x && newY == position.y
+    })) {
       throw new Error(`position does not exist on card`)
     }
 
@@ -74,28 +82,41 @@ export function StateWrapper({ children }: { children: any }) {
         opponentUnits.splice(deadUnit, 1)
         //@ts-ignore
         newState[opponentUnitsProp] = opponentUnits
-      }
 
-      // check for winner
-      // @ts-ignore
-      if (prevState[opponentUnitsProp][deadUnit].type == "captain") {
-        window.alert(`the winner is ${currentPlayer}`)
+        // check for winner
+        // @ts-ignore
+        if (prevState[opponentUnitsProp][deadUnit].type == "captain") {
+          window.alert(`the winner is ${currentPlayer}`)
+        }
       }
       //move the peice(s)
       newState[`${currentPlayer}Units`][unitIndex].position = position
 
+      //update currentPlayer
+      newState.currentPlayer = opponent
+
       //update the cards
       newState[`${currentPlayer}NextCard`] = null
       newState[`player${opponent}NextCard`] = cardIndex
+      console.log(cardIndex, prevState[`${currentPlayer}Cards`])
       const oldCardIndex = prevState[`${currentPlayer}Cards`].find(c => c != cardIndex)
-      if (!oldCardIndex) {
+      if (typeof oldCardIndex == 'undefined') {
         throw new Error("couldnt find alternate card for player")
       }
       newState[`${currentPlayer}Cards`] = [oldCardIndex, prevState[`${currentPlayer}NextCard`] as number]
 
       return newState
     })
+    return true;
   }
 
   return <GameStateContext.Provider value={{ gameState, playTurn }}>{children}</GameStateContext.Provider>
+}
+
+
+function normalizePositions(currentPlayer:'player1'|'player2', positions:Position[]){
+  if(currentPlayer == 'player2'){
+    return positions
+  }
+  return inverseMovePositions(positions)
 }

@@ -33,10 +33,11 @@ body * {
 }
 .board{
   grid-area:board;
+  align-self:center;
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
   grid-template-rows:repeat(5,minmax(0,1fr));
-  width:auto;
+  width:100%;
   margin-inline:auto;
   justify-content:space-between;
   /* align-content:center; */
@@ -49,6 +50,7 @@ body * {
   align-self:center;
   margin-inline:auto;
   height:100%;
+  border:5px solid transparent;
   display:grid;
   place-content:center;
   background:white;
@@ -61,6 +63,7 @@ body * {
   grid-area:leftNext;
 }
 .right-next{
+  align-self:flex-end;
   grid-area:rightNext;
 }
 .player-1{
@@ -82,6 +85,9 @@ body * {
 }
 .selected-pos{
   border:5px solid cyan;
+}
+.move-hint{
+  background:tan;
 }
 
 .confirm-button{
@@ -121,6 +127,7 @@ body * {
   aspect-ratio:5/3;
 }
 .card-grid{
+  pointer-events:none;
   height:100%;
   aspect-ratio:1;
   position:relative;
