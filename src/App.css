@@ -1,41 +1,145 @@
-#root {
-  max-width: 1280px;
+body{
+  box-sizing:border-box;
+  margin:0;
+}
+body * {
+  box-sizing:inherit;
+
+}
+
+.App {
+  padding:1rem;
+  max-width: 100vw;
+  max-height: 100vh;
+  width:100%;
+  height:100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+  display:grid;
+
+}
+.board-wrapper{
+  display:grid;
+  width:100%;
+  max-height:100vh;
+  height:100vh;
+  gap:5px;
+  grid-template-areas:
+  "player1cards player1cards player1cards"
+  "leftNext board rightNext"
+  "player2cards player2cards player2cards";
+  grid-template-columns:200px 1fr 200px;
+  grid-template-rows:200px 1fr 200px;
+}
+.board{
+  grid-area:board;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:repeat(5,minmax(0,1fr));
+  width:auto;
+  margin-inline:auto;
+  justify-content:space-between;
+  /* align-content:center; */
+  gap:10px;
+  aspect-ratio:1;
+}
+.board > :where(div){
+  color:black;
+  width:100%;
+  align-self:center;
+  margin-inline:auto;
+  height:100%;
+  display:grid;
+  place-content:center;
+  background:white;
+  aspect-ratio:1;
+}
+.next-card .card{
+  width:100%; 
+}
+.left-next{
+  grid-area:leftNext;
+}
+.right-next{
+  grid-area:rightNext;
+}
+.player-1{
+  color:red;
+}
+.player-2{
+  color:blue;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
+.type-captain{
+  font-weight:bold;
+  font-size:1.4em;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.selected-card{
+  border:5px solid violet;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.selected-unit{
+  border:5px solid violet;
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.selected-pos{
+  border:5px solid cyan;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.confirm-button{
+  background-color:purple;
+  position:absolute;
+  top:0;
+  left:0;
+}
+.player-cards:first-of-type{
+  grid-area:player1cards;
+}
+.player-cards:last-of-type{
+  grid-area:player2cards;
+}
+.player-cards{
+  width:100%;
+  margin-inline:auto;
+  /* display:grid; */
+  /* grid-template-columns:repeat(2,50%); */
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.card{
+  max-height:100%;
+  height:150px;
+  position:relative;
+  background:ghostwhite;
+  width:auto;
+  color:olive;
+  display:flex;
+  align-items:center;
+  border-radius:4px;
+  padding:.5em;
+  justify-content:space-between;
+  aspect-ratio:5/3;
+}
+.card-grid{
+  height:100%;
+  aspect-ratio:1;
+  position:relative;
+  display:grid;
+  gap:1px;
+  width:75%;
+  grid-template-columns:repeat(5,minmax(1px, 20%));
+  grid-template-rows:repeat(5,20%);
+}
+.move-position {
+  width:100%;
+  height:100%;
+  border:1px solid black;
+  /* aspect-ratio:1; */
+}
+.move-position.me{
+  background:black;
+}
+.move-position.possible-move{
+  background:red;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
