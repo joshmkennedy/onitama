@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import { Card, GameState, Position, Unit } from "./types";
 import { inverseMovePositions } from "./utils";
+import cardlist from "./cards";
 export default function useGameState() {
   return useContext<{
     gameState: GameState;
@@ -14,53 +15,16 @@ export default function useGameState() {
 
 const GameStateContext = createContext<any>(null);
 
-const cards: Card[] = [
-  {
-    name: "Boar",
-    positions: [
-      { x: -1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-    ],
-  },
-  {
-    name: "Cobra",
-    positions: [
-      { x: -1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-    ],
-  },
-  {
-    name: "Kick",
-    positions: [
-      { x: -1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-    ],
-  },
-  {
-    name: "Snake",
-    positions: [
-      { x: -1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-    ],
-  },
-  {
-    name: "Cactus",
-    positions: [
-      { x: -1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-    ],
-  },
-];
+function getRandomCards() {
+  const cards = cardlist.sort(() => Math.floor(Math.random() - 0.5));
+  cards.length = 5;
+  return cards;
+}
 
-export function StateWrapper({ children }: { children: any }) {
-  const [gameState, setGameState] = useState<GameState>({
+function getInitialState(): GameState {
+  return {
     currentPlayer: 1,
-    Cards: cards,
+    Cards: getRandomCards(),
     player1Cards: [0, 1],
     player1NextCard: 2,
     player2NextCard: null,
@@ -79,7 +43,13 @@ export function StateWrapper({ children }: { children: any }) {
       { id: 9, type: "pawn", position: { x: 3, y: 4 }, owner: 2 },
       { id: 10, type: "pawn", position: { x: 4, y: 4 }, owner: 2 },
     ],
-  });
+  };
+}
+
+const initialState = getInitialState();
+
+export function StateWrapper({ children }: { children: any }) {
+  const [gameState, setGameState] = useState<GameState>(initialState);
 
   function playTurn(cardIndex: number, proposedUnit: Unit, position: Position) {
     const currentPlayer = gameState.currentPlayer == 1 ? "player1" : "player2";
@@ -97,7 +67,7 @@ export function StateWrapper({ children }: { children: any }) {
       throw new Error(`${currentPlayer} doesnt own played card`);
     }
 
-    const card = cards[cardIndex];
+    const card = gameState.Cards[cardIndex];
 
     //check if position exits on card
     if (
@@ -139,6 +109,7 @@ export function StateWrapper({ children }: { children: any }) {
         // @ts-ignore
         if (prevState[opponentUnitsProp][deadUnit].type == "captain") {
           window.alert(`the winner is ${currentPlayer}`);
+          return getInitialState();
         }
       }
       //move the peice(s)
