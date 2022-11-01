@@ -94,19 +94,18 @@ export function StateWrapper({ children }: { children: any }) {
       const newState = { ...prevState };
       //check for collisions
       const opponent = prevState.currentPlayer == 1 ? 2 : 1;
-      const opponentUnitsProp = `player${opponent}Units`;
-      //@ts-ignore
+      const opponentUnitsProp = `player${opponent}Units` as
+        | "player1Units"
+        | "player2Units";
       const opponentUnits: Unit[] = [...gameState[opponentUnitsProp]];
       const deadUnit = opponentUnits
         .map((unit) => unit.position)
         .findIndex((OPos) => OPos.x == position.x && OPos.y == position.y);
       if (deadUnit != -1) {
         opponentUnits.splice(deadUnit, 1);
-        //@ts-ignore
         newState[opponentUnitsProp] = opponentUnits;
 
         // check for winner
-        // @ts-ignore
         if (prevState[opponentUnitsProp][deadUnit].type == "captain") {
           window.alert(`the winner is ${currentPlayer}`);
           return getInitialState();
