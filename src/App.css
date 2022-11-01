@@ -16,7 +16,9 @@ body * {
   margin: 0 auto;
   text-align: center;
   display:grid;
-
+}
+.app-header{
+  padding-block:1rem;
 }
 .board-wrapper{
   display:grid;

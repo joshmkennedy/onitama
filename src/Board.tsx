@@ -2,7 +2,7 @@ import * as React from "react"
 import type { Position, Unit } from "./types"
 import useGameState from "./state"
 import { Tile } from "./Tile"
-import { PlayerCards, playerCardsKey } from "./PlayerCards"
+import { PlayerCards  } from "./PlayerCards"
 import  NextCard  from "./NextCard"
 import { inverseMovePositions, onBoard } from "./utils"
 
@@ -11,7 +11,7 @@ const boardGrid = buildGrid(5)
 export default function Board() {
   const { gameState, playTurn } = useGameState()
 
-  const [selectedUnit, setSelectedUnit] = React.useState<Position | null>(null)
+  const [selectedUnit, setSelectedUnit] = React.useState<Unit | null>(null)
   const [selectedPos, setSelectedPos] = React.useState<Position | null>(null)
   const [selectedCard, setSelectedCard] = React.useState<number | null>(null)
 
@@ -26,23 +26,29 @@ export default function Board() {
   const isShowingConfirm = React.useMemo(() => selectedPos && selectedUnit, [selectedPos, selectedUnit])
 
   const chooseTile = React.useCallback(function chooseTile(unit: Unit | null, position: Position) {
-    if (selectedCard == null) {
+    if (selectedCard == null) return;
+
+    if(unit?.position.x == selectedUnit?.position.x && selectedUnit?.position.y == unit?.position.y){
+      setSelectedUnit(null)
+      setSelectedPos(null)
       return
     }
-    if(selectedUnit){
-      if(unit?.position.x == selectedUnit.x && selectedUnit.y == unit?.position.y) {
-        setSelectedUnit(null)
-        setSelectedPos(null)
-      }else{
-        if(selectedPos &&position.x == selectedPos.x && selectedPos.y == position.y){
-          setSelectedPos(null)
-          return
-        }
+
+    if(unit && unit.owner == gameState.currentPlayer){
+      setSelectedUnit(unit)
+      return
+    }
+
+    if(selectedPos && selectedPos.x == position.x && selectedPos.y == position.y){
+      setSelectedPos(null) 
+      return
+    }
+
+    if(selectedUnit && unit?.owner != gameState.currentPlayer){
+      if(movePosHints.some((hint)=> hint.x == position.x && hint.y == position.y)){
         setSelectedPos(position)
       }
-      return
     }
-    setSelectedUnit(position)
   },[selectedCard, selectedUnit, selectedPos])
 
   const movePosHints = React.useMemo(()=>{
@@ -51,7 +57,7 @@ export default function Board() {
     const player = gameState.currentPlayer
     const possiblePosisitons = player == 2 ? card.positions: inverseMovePositions(card.positions)
     const relativePositions = possiblePosisitons.map((pos)=>{
-      return {x:selectedUnit.x + pos.x, y:selectedUnit.y + pos.y}
+      return {x:selectedUnit.position.x + pos.x, y:selectedUnit.position.y + pos.y}
     }).filter(onBoard)
     return relativePositions
   },[selectedCard, selectedUnit])
@@ -64,7 +70,7 @@ export default function Board() {
           const owner = findOwner({ x, y }, gameState.player1Units, gameState.player2Units)
           return <Tile 
             isSelectedPos={selectedPos?.x == x && selectedPos?.y == y}
-            isSelectedUnit={selectedUnit?.x == x && selectedUnit?.y == y} 
+            isSelectedUnit={selectedUnit?.position.x == x && selectedUnit?.position.y == y} 
             onClick={() => chooseTile(owner, { x, y })} key={`${x}, ${y} `} 
             owner={owner} 
             classes={`${isMoveHint({x,y},movePosHints) ? 'move-hint' :''}`}
@@ -75,15 +81,17 @@ export default function Board() {
     </div>
     <NextCard player={1}/>
     <NextCard player={2}/>
-    {isShowingConfirm && <button onClick={()=>{
-      console.log(selectedCard,selectedUnit)
-      if(selectedUnit==null || selectedCard==null) return
-        const success = playTurn(selectedCard, gameState[`player${gameState.currentPlayer}Units`].find(
-        (unit)=>unit.position.x == selectedUnit?.x && unit.position.y == selectedUnit?.y)?.id, selectedPos )
-        if(success){
+    {isShowingConfirm &&
+      <button
+        onClick={()=>{
+          if(selectedUnit==null || selectedCard==null) return
+          playTurn( selectedCard, selectedUnit, selectedPos )
           setSelectedCard(null)
-        }
-    }} className="confirm-button">Take Turn</button>}
+        }} 
+        className="confirm-button"
+      >
+        Take Turn
+      </button>}
     <PlayerCards player={2} selected={selectedCard} setSelected={setSelectedCard} />
   </div>
 }
