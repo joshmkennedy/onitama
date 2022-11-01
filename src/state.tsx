@@ -111,6 +111,14 @@ export function StateWrapper({ children }: { children: any }) {
           return getInitialState();
         }
       }
+      //check for winner
+      if (
+        unit.type == "captain" &&
+        isOpponentsBase(position, prevState.currentPlayer)
+      ) {
+        window.alert(`the winner is ${currentPlayer}`);
+        return getInitialState();
+      }
       //move the peice(s)
       newState[`${currentPlayer}Units`][unitIndex].position = position;
 
@@ -152,4 +160,11 @@ function normalizePositions(
     return positions;
   }
   return inverseMovePositions(positions);
+}
+
+const playerOneBase = { x: 2, y: 0 };
+const playerTwoBase = { x: 2, y: 4 };
+function isOpponentsBase(position: Position, currentPlayer: 1 | 2) {
+  const opponentBase = currentPlayer == 1 ? playerTwoBase : playerOneBase;
+  return position.x == opponentBase.x && opponentBase.y == position.y;
 }

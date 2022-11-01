@@ -10,7 +10,7 @@ export default function NextCard({ player }: { player: 1 | 2 }) {
   const side = player == 1 ? "left-next" : "right-next";
   return (
     <div className={`${side} next-card`}>
-      <p>Next Card</p>
+      <p className="next-card-label">Next Card</p>
       <CardDisplay classes={``} owner={player} card={card} />
     </div>
   );
