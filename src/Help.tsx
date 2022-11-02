@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const boardLayoutImage = "/board-layout.png";
 const basesImage = "/Bases.png";
@@ -23,7 +23,9 @@ export default function Help({ close }: { close: () => void }) {
         &times;
       </button>
       <div className="slider">
-        <Current />
+        <AnimatePresence>
+          <Current />
+        </AnimatePresence>
       </div>
       <div className="Help__button-row">
         <button onClick={prev}>Previous</button>
@@ -32,10 +34,14 @@ export default function Help({ close }: { close: () => void }) {
     </div>
   );
 }
-
+const motionSettings = {
+  initial: { opacity: 0, x: -200 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0 },
+};
 const slides = [
   () => (
-    <div className="slide">
+    <motion.div {...motionSettings} key={1} className="slide">
       <h3>Overview</h3>
       <div className="image">
         <img src={boardLayoutImage} />
@@ -44,11 +50,11 @@ const slides = [
         Onitama is a two player game, where players take turn choosing from 2
         cards that will move their units around the game board.
       </p>
-    </div>
+    </motion.div>
   ),
 
   () => (
-    <div className="slide">
+    <motion.div {...motionSettings} key={2} className="slide">
       <h3>Units</h3>
       <div className="flex-row">
         <div className="image">
@@ -60,20 +66,20 @@ const slides = [
           <p>Player 1 Pawn</p>
         </div>
       </div>
-    </div>
+    </motion.div>
   ),
 
   () => (
-    <div className="slide">
+    <motion.div className="slide" {...motionSettings} key={3}>
       <h3>Bases</h3>
       <div className="image">
         <img src={basesImage} />
       </div>
-    </div>
+    </motion.div>
   ),
 
   () => (
-    <div className="slide">
+    <motion.div className="slide" {...motionSettings} key={4}>
       <h3>The Players Turn</h3>
       <div className="image">
         <img src={PlayTurnWalkthrough} />
@@ -86,11 +92,11 @@ const slides = [
         "Take Turn" button to confirm their move. It will then be the next
         players turn.
       </p>
-    </div>
+    </motion.div>
   ),
 
   () => (
-    <div className="slide">
+    <motion.div className="slide" {...motionSettings} key={5}>
       <h3>Win Conditions</h3>
       <div className="flex-row">
         <div className="image">
@@ -106,6 +112,6 @@ const slides = [
         You can win by either capturing the opponent's Captain or by Capturing
         their base.
       </p>
-    </div>
+    </motion.div>
   ),
 ];
